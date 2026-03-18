@@ -11,6 +11,8 @@ class Package:
                  package_zip,
                  deadline,
                  weight,
+                 weight_class,
+                 constraints,
                  notes,
                  status,
                  delivery_time = None
@@ -22,6 +24,8 @@ class Package:
         self._package_zip = package_zip
         self._deadline = deadline
         self._weight = weight
+        self._weight_class = weight_class
+        self._constraints = constraints
         self._notes = notes
         self._status = status
         self._delivery_time = delivery_time
@@ -76,6 +80,14 @@ class Package:
         return self._weight
 
     @property
+    def weight_class(self):
+        return self._weight_class
+
+    @property
+    def constraints(self):
+        return self._constraints
+
+    @property
     def notes(self):
         return self._notes
 
@@ -110,8 +122,6 @@ class Package:
             f"Package ID: {self._package_id}",
             f"Address: {self._address}",
             f"Deadline: {self._deadline}",
-            f"Notes: {self._notes}",
-            f"Status: {self._status}",
             f"Delivery Time: {self._delivery_time}"
             ]
         return "\n".join(details)

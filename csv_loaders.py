@@ -1,21 +1,15 @@
-# instead of loading the entire file into memory, this import loads the
-# file in row by row, which allows for more efficient data parsing
 import csv
+from datetime import datetime
 
 from package import Package
 from status import Status
 from hash_table import HashTable
 
-status = None
-delivery_time = None
-
-# IMPORTANT FOR OTHER COMPANIES:
-# Your number of addresses may be different than WGUPS's.  Adjust accordingly.
-num_addresses = 27
-distances_matrix = [[None for _ in range(num_addresses)] for _ in range(num_addresses)]
-locations_matrix = [[None for _ in range(3)] for _ in range(num_addresses)]
-
 def load_csvs():
+    status = None
+    delivery_time = None
+    deadline = None
+
     ht = HashTable()    # create HashTable object upon csv load
 
     with open('data/packages.csv', 'r') as packages:
@@ -27,15 +21,31 @@ def load_csvs():
                 status = Status.DELAYED
             else:
                 status = Status.AT_HUB
-            # create package class based on the package attributes in csv file
+
+            if row['Delivery Deadline'] == 'EOD':
+                deadline = datetime(2038, 1, 19, 17, 0)
+            else:
+                deadline = datetime.strptime(row['Delivery Deadline'], "%I:%M %p")
+                deadline = deadline.replace(2038, 1, 19)
+
+            # same as this:
+            # result = []
+            # for x in ['REFRIG', 'SIG', '']
+            #   if x:
+            #       result.append(x)
+            constraints = set(x for x in row['Constraints'].split('|') if x)
+
+            # create package object based on the package attributes in csv file
             package = Package(
                 int(row['Package ID']), # important to make package_id an integer
                 row['Address'],
                 row['City'],
                 row['State'],
                 row['Zip'],
-                row['Delivery Deadline'],
+                deadline,
                 row['Weight KILO'],
+                row['Weight Class'],
+                constraints,
                 row['Special Notes'],
                 status,
                 delivery_time
@@ -43,6 +53,10 @@ def load_csvs():
 
             # insert package into the HashTable object's table
             ht.insert(package)
+
+    num_addresses = 87
+    distances_matrix = [[None for _ in range(num_addresses)] for _ in range(num_addresses)]
+    locations_matrix = [[None for _ in range(3)] for _ in range(num_addresses)]
 
     # load locations
     with open('data/locations.csv', 'r') as locations:
@@ -61,20 +75,10 @@ def load_csvs():
         for row in csv_reader:
             col_num = 0
             for distance in row:
-                # see note at top of function def
-                distances_insert(row_num, col_num, float(distance))
+                distances_matrix[row_num][col_num] = float(distance)
                 col_num += 1
             row_num += 1
 
     # return the HashTable object just created, as well as the locations
     # and distances matrices that our routing program will need
     return ht, locations_matrix, distances_matrix
-
-# IMPORTANT FOR OTHER COMPANIES:
-# If you use a full distance matrix instead of a condensed distance matrix,
-# this step is not necessary
-def distances_insert(row, col, distance):
-    distances_matrix[row][col] = distance
-
-    # do this so that we have a full matrix, not just half
-    distances_matrix[col][row] = distance

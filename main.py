@@ -56,7 +56,8 @@
 # =============================================================================
 
 from csv_loaders import load_csvs
-from routing_program import load_trucks, nearest_neighbor
+from load_trucks import load_trucks
+from routing_program import nearest_neighbor
 from hash_table import HashTable
 from cli import run_cli
 

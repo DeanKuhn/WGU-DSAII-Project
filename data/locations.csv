@@ -1,28 +1,88 @@
-Index,Name,Address
-0,Western Governors University,4001 South 700 East
-1,International Peace Gardens,1060 Dalton Ave S
-2,Sugar House Park,1330 2100 S
-3,Taylorsville-Bennion Heritage City Gov Off,1488 4800 S
-4,Salt Lake City Division of Health Services,177 W Price Ave
-5,South Salt Lake Public Works,195 W Oakland Ave
-6,Salt Lake City Streets and Sanitation,2010 W 500 S
-7,Deker Lake,2300 Parkway Blvd
-8,Salt Lake City Ottinger Hall,233 Canyon Rd
-9,Columbus Library,2530 S 500 E
-10,Taylorsville City Hall,2600 Taylorsville Blvd
-11,South Salt Lake Police,2835 Main St
-12,Council Hall,300 State St
-13,Redwood Park,3060 Lester St
-14,Salt Lake County Mental Health,3148 S 1100 W
-15,Salt Lake County/United Police Dept,3365 S 900 W
-16,West Valley Prosecutor,3575 W Valley Central Station bus Loop
-17,Housing Auth. of Salt Lake County,3595 Main St
-18,Utah DMV Administrative Office,380 W 2880 S
-19,Third District Juvenile Court,410 S State St
-20,Cottonwood Regional Softball Complex,4300 S 1300 E
-21,Holiday City Office,4580 S 2300 E
-22,Murray City Museum,5025 State St
-23,Valley Regional Softball Complex,5100 South 2700 West
-24,City Center of Rock Springs,5383 South 900 East #104
-25,Rice Terrace Pavilion Park,600 E 900 South
-26,Wheeler Historic Farm,6351 South 900 East
+Location ID,Name,Address,City,State,Zip
+0,WGU Hub,4001 South 700 East,Salt Lake City,UT,84107
+1,195 W Oakland Ave,195 W Oakland Ave,Salt Lake City,UT,84115
+2,2530 S 500 E,2530 S 500 E,Salt Lake City,UT,84106
+3,233 Canyon Rd,233 Canyon Rd,Salt Lake City,UT,84103
+4,380 W 2880 S,380 W 2880 S,Salt Lake City,UT,84115
+5,410 S State St,410 S State St,Salt Lake City,UT,84111
+6,3060 Lester St,3060 Lester St,West Valley City,UT,84119
+7,1330 2100 S,1330 2100 S,Salt Lake City,UT,84106
+8,300 State St,300 State St,Salt Lake City,UT,84103
+9,600 E 900 South,600 E 900 South,Salt Lake City,UT,84105
+10,2600 Taylorsville Blvd,2600 Taylorsville Blvd,Salt Lake City,UT,84118
+11,3575 W Valley Central Station bus Loop,3575 W Valley Central Station bus Loop,West Valley City,UT,84119
+12,2010 W 500 S,2010 W 500 S,Salt Lake City,UT,84104
+13,4300 S 1300 E,4300 S 1300 E,Millcreek,UT,84117
+14,4580 S 2300 E,4580 S 2300 E,Holladay,UT,84117
+15,3148 S 1100 W,3148 S 1100 W,Salt Lake City,UT,84119
+16,1488 4800 S,1488 4800 S,Salt Lake City,UT,84123
+17,177 W Price Ave,177 W Price Ave,Salt Lake City,UT,84115
+18,3595 Main St,3595 Main St,Salt Lake City,UT,84115
+19,6351 South 900 East,6351 South 900 East,Murray,UT,84121
+20,5100 South 2700 West,5100 South 2700 West,Salt Lake City,UT,84118
+21,5025 State St,5025 State St,Murray,UT,84107
+22,5383 South 900 East #104,5383 South 900 East #104,Salt Lake City,UT,84117
+23,1060 Dalton Ave S,1060 Dalton Ave S,Salt Lake City,UT,84104
+24,2835 Main St,2835 Main St,Salt Lake City,UT,84115
+25,1330 2100 S,1330 2100 S,Salt Lake City,UT,84106
+26,3365 S 900 W,3365 S 900 W,Salt Lake City,UT,84119
+27,2300 Parkway Blvd,2300 Parkway Blvd,West Valley City,UT,84119
+28,4400 S 700 E,4400 S 700 E,Salt Lake City,UT,84107
+29,860 E 4800 S,860 E 4800 S,Salt Lake City,UT,84107
+30,1234 W 2100 S,1234 W 2100 S,Salt Lake City,UT,84119
+31,670 S 700 E,670 S 700 E,Salt Lake City,UT,84102
+32,750 W 900 S,750 W 900 S,Salt Lake City,UT,84104
+33,1700 W 4700 S,1700 W 4700 S,Taylorsville,UT,84123
+34,5500 S Redwood Rd,5500 S Redwood Rd,Taylorsville,UT,84123
+35,3900 S Wasatch Blvd,3900 S Wasatch Blvd,Salt Lake City,UT,84124
+36,2780 S Main St,2780 S Main St,Salt Lake City,UT,84115
+37,4550 W 5400 S,4550 W 5400 S,Kearns,UT,84118
+38,6200 S State St,6200 S State St,Murray,UT,84107
+39,1390 S 2200 W,1390 S 2200 W,Salt Lake City,UT,84104
+40,790 E 2100 S,790 E 2100 S,Salt Lake City,UT,84106
+41,3200 W 3100 S,3200 W 3100 S,West Valley City,UT,84119
+42,4820 S 4000 W,4820 S 4000 W,West Valley City,UT,84120
+43,6100 W 3500 S,6100 W 3500 S,West Valley City,UT,84128
+44,2100 N Redwood Rd,2100 N Redwood Rd,Salt Lake City,UT,84116
+45,500 S 400 W,500 S 400 W,Salt Lake City,UT,84101
+46,1900 W North Temple,1900 W North Temple,Salt Lake City,UT,84116
+47,3640 S 700 W,3640 S 700 W,Salt Lake City,UT,84119
+48,7200 S 1300 E,7200 S 1300 E,Midvale,UT,84047
+49,7800 S State St,7800 S State St,Midvale,UT,84047
+50,8000 S 700 E,8000 S 700 E,Sandy,UT,84070
+51,9400 S 700 E,9400 S 700 E,Sandy,UT,84070
+52,10200 S 1300 E,10200 S 1300 E,Sandy,UT,84092
+53,10600 S Sego Lily Dr,10600 S Sego Lily Dr,Sandy,UT,84094
+54,11400 S District Dr,11400 S District Dr,South Jordan,UT,84095
+55,11400 S Lone Peak Pkwy,11400 S Lone Peak Pkwy,Draper,UT,84020
+56,11800 S River Heights Dr,11800 S River Heights Dr,South Jordan,UT,84095
+57,12600 S 900 E,12600 S 900 E,Draper,UT,84020
+58,13200 S Minuteman Dr,13200 S Minuteman Dr,Draper,UT,84020
+59,1200 W 7800 S,1200 W 7800 S,West Jordan,UT,84088
+60,3600 W 9000 S,3600 W 9000 S,West Jordan,UT,84088
+61,7400 S Redwood Rd,7400 S Redwood Rd,West Jordan,UT,84084
+62,8400 S 1300 W,8400 S 1300 W,West Jordan,UT,84088
+63,9800 S Redwood Rd,9800 S Redwood Rd,South Jordan,UT,84095
+64,5400 W Daybreak Pkwy,5400 W Daybreak Pkwy,South Jordan,UT,84095
+65,4800 W Magna Main St,4800 W Magna Main St,Magna,UT,84044
+66,3300 S 8400 W,3300 S 8400 W,Magna,UT,84044
+67,1300 N 5600 W,1300 N 5600 W,Salt Lake City,UT,84116
+68,2900 W 2100 S,2900 W 2100 S,Salt Lake City,UT,84119
+69,4100 S 4000 W,4100 S 4000 W,West Valley City,UT,84120
+70,5200 S 4400 W,5200 S 4400 W,Kearns,UT,84118
+71,6700 S 4000 W,6700 S 4000 W,West Jordan,UT,84084
+72,1480 N 2200 W,1480 N 2200 W,Salt Lake City,UT,84116
+73,2250 N 1200 W,2250 N 1200 W,Salt Lake City,UT,84116
+74,2600 S 600 W,2600 S 600 W,Salt Lake City,UT,84115
+75,3800 S West Temple,3800 S West Temple,Salt Lake City,UT,84115
+76,4600 S West Temple,4600 S West Temple,Murray,UT,84107
+77,5600 S 300 W,5600 S 300 W,Murray,UT,84107
+78,6400 S 300 W,6400 S 300 W,Murray,UT,84107
+79,7100 S 300 W,7100 S 300 W,Midvale,UT,84047
+80,8200 S 300 W,8200 S 300 W,West Jordan,UT,84088
+81,9200 S 300 W,9200 S 300 W,West Jordan,UT,84088
+82,450 E Vine St,450 E Vine St,Murray,UT,84107
+83,230 W 5300 S,230 W 5300 S,Murray,UT,84107
+84,1710 S Redwood Rd,1710 S Redwood Rd,Salt Lake City,UT,84104
+85,2920 S Main St,2920 S Main St,Salt Lake City,UT,84115
+86,3120 S Highland Dr,3120 S Highland Dr,Salt Lake City,UT,84106

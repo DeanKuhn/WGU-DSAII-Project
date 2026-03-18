@@ -3,17 +3,16 @@ from datetime import datetime
 class Truck:
     def __init__(
             self,
-            truck_array,
             current_location,
             mileage,
-            current_time,
-            departure_time
+            departure_time,
+            refrigerated_capable
             ):
-        self._truck_array = truck_array
+        self._truck_array = []
         self._current_location = current_location
         self._mileage = mileage
-        self._current_time = current_time
         self._departure_time = departure_time
+        self._refrigerated_capable = refrigerated_capable
 
     # once array is set it should not be mutable
     @property
@@ -37,17 +36,6 @@ class Truck:
         self._mileage = value
 
     @property
-    def current_time(self):
-        return self._current_time
-
-    @current_time.setter
-    def current_time(self, value):
-        if value is None or isinstance(value, datetime):
-            self._current_time = value
-        else:
-            raise ValueError("Time does not match datetime format.")
-
-    @property
     def departure_time(self):
         return self._departure_time
 
@@ -57,3 +45,11 @@ class Truck:
             self._departure_time = value
         else:
             raise ValueError("Time does not match datetime format.")
+
+    @property
+    def refrigerated_capable(self):
+        return self._refrigerated_capable
+
+    @refrigerated_capable.setter
+    def refrigerated_capable(self, value):
+        self._refrigerated_capable = value
