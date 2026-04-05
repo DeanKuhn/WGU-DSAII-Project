@@ -1,5 +1,6 @@
 # timedelta is needed for datetime conversion
-from datetime import datetime, timedelta
+import datetime
+from datetime import timedelta
 
 from status import Status
 from truck import Truck
@@ -42,7 +43,7 @@ def load_trucks(ht):
         truck1_array,                       # assign truck array
         'Western Governors University',     # assign starting location
         0,                                  # assign starting mileage
-        datetime(2038, 1, 19, 8, 0),        # assign current time
+        datetime(8, 0),        # assign current time
         datetime(2038, 1, 19, 8, 0)         # assign departure time
         )
 
@@ -50,8 +51,8 @@ def load_trucks(ht):
         truck2_array,
         '4001 South 700 East',
         0,
-        datetime(2038, 1, 19, 8, 0),
-        datetime(2038, 1, 19, 8, 0)
+        datetime(8, 0),
+        datetime(8, 0)
         )
 
     truck3 = Truck(
@@ -83,7 +84,7 @@ def nearest_neighbor(truck, locations, distances, starting_time):
     # been delivered upon starting the nearest neighbor algorithm.
     # Please take this into consideration when implementing this algorithm
     # in your own trucking routes.
-    for _ in range(len(truck.truck_array)):
+    for _ in range(len(truck.packages)):
         # find current location in locations matrix
         for location in locations:
             if location[2] == truck.current_location:
@@ -108,13 +109,13 @@ def nearest_neighbor(truck, locations, distances, starting_time):
         ten_deadline_array = []
         no_deadline_array = []
 
-        for package in truck.truck_array:
+        for package in truck.packages:
             if package.deadline == '9:00 AM' and package.status != Status.DELIVERED:
                 nine_deadline_array.append(package)
-        for package in truck.truck_array:
+        for package in truck.packages:
             if package.deadline == '10:30 AM' and package.status != Status.DELIVERED:
                 ten_deadline_array.append(package)
-        for package in truck.truck_array:
+        for package in truck.packages:
             if package.deadline == 'EOD' and package.status != Status.DELIVERED:
                 no_deadline_array.append(package)
 

@@ -59,7 +59,9 @@ from csv_loaders import load_csvs
 from load_trucks import load_trucks
 from routing_program import nearest_neighbor
 from hash_table import HashTable
-from cli import run_cli
+from cli import run_cli, ask_intro_questions
+from ga_loading import run_ga, load_chromosome
+from kmeans_cluster_packages import cluster_packages
 
 ht = HashTable()
 
@@ -67,10 +69,41 @@ def main():
     # pass empty HashTable object, locations matrix, and distances matrix
     # to the load_csvs() function to be loaded
     ht, locations, distances = load_csvs()
-    # pass HashTable object (now full of packages) to load trucks, and return
-    # three truck objects, now full of their respecive packages
-    truck1, truck2, truck3 = load_trucks(ht)
+    packages = ht.get_array()
+    packages = [p for p in packages if p is not None]
+    num_trucks = 4
+    num_refrig = 2
+    num_capacity = 30
+    trucks = load_trucks(num_trucks, num_refrig, num_capacity)
+    cluster_map = cluster_packages(packages, distances, locations, num_trucks)
+    chromosome = run_ga(packages, trucks, cluster_map)
+    trucks = load_chromosome(chromosome, packages, trucks)
 
+    for truck in trucks:
+        print(f"\nTruck {truck.truck_id}")
+        print(f"  Package count: {len(truck.packages)}")
+        print(f"  Capacity: {truck.capacity}")
+
+        refrig_violations = 0
+        delay_violations = 0
+        for p in truck.packages:
+            if p.refrigerated and not truck.refrigerated_capable:
+                refrig_violations += 1
+            if p.delay_time is not None:
+                if p.delay_time > truck.departure_time:
+                    delay_violations += 1
+
+    print(f"  Refrigeration violations: {refrig_violations}")
+    print(f"  Delay violations: {delay_violations}")
+    # Sanity check after apply_chromosome
+    for truck in trucks:
+        print(f"\nTruck {truck.truck_id}")
+        print(f"  Departure: {truck.departure_time}")
+        print(f"  Refrigerated: {truck.refrigerated_capable}")
+        print(f"  Package count: {len(truck.packages)}")
+        for p in truck.packages:
+            print(f"    Package {p.package_id} | deadline: {p.deadline} | refrig: {p.refrigerated} | delay: {p.delay_time}")
+    return
     # run all three trucks
     ### print("\nTruck 1 starting:\n")
     return_time1, mileage1 = nearest_neighbor(truck1, locations, distances, None)

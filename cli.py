@@ -1,6 +1,7 @@
 from colorama import Fore, init
-from datetime import datetime
+import datetime
 import time
+import math
 
 init(autoreset=True)
 
@@ -62,7 +63,7 @@ def print_delivery_time(package_time, package):
         return f"{package.delivery_time}"
 
 def find_package_status(package_time, package, package_truck):
-    if package_time < datetime(2038, 1, 19, 9, 5) and package.package_id in (6, 25, 28, 32):
+    if package_time < datetime.time(9, 5) and package.package_id in (6, 25, 28, 32):
         print(Fore.WHITE + "Package ID: " + Fore.GREEN + f"{package.package_id}"
               + Fore.WHITE + " | Status: " + Fore.CYAN + "DELAYED"
               + Fore.WHITE + " | Deadline: " + Fore.RED + f"{package.deadline}"
@@ -85,11 +86,11 @@ def find_package_status(package_time, package, package_truck):
 
 def find_package_truck(package, truck1, truck2, truck3):
     package_truck = None
-    if package in truck1.truck_array:
+    if package in truck1.packages:
         package_truck = truck1
-    elif package in truck2.truck_array:
+    elif package in truck2.packages:
         package_truck = truck2
-    elif package in truck3.truck_array:
+    elif package in truck3.packages:
         package_truck = truck3
 
     return package_truck
@@ -142,8 +143,7 @@ def run_cli(mileage, ht, truck1, truck2, truck3):
                 package_time_input = input(Fore.WHITE + ">>> ")
                 # convert time to datetime
                 try:
-                    package_time = datetime.strptime(package_time_input, "%I:%M %p")
-                    package_time = package_time.replace(year = 2038, month = 1, day = 19)
+                    package_time = datetime.datetimestrptime(package_time_input, "%I:%M %p").time()
                 except ValueError:
                     print("Invalid time format.  Please use HH::MM AM/PM.")
                     continue
@@ -168,8 +168,7 @@ def run_cli(mileage, ht, truck1, truck2, truck3):
                 package_time_input = input(Fore.WHITE + ">>> ")
                 # convert time to datetime
                 try:
-                    package_time = datetime.strptime(package_time_input, "%I:%M %p")
-                    package_time = package_time.replace(year = 2038, month = 1, day = 19)
+                    package_time = datetime.datetime.strptime(package_time_input, "%I:%M %p").time()
                 except ValueError:
                     print("Invalid time format.  Please use HH::MM AM/PM.")
                     continue
@@ -198,3 +197,33 @@ def run_cli(mileage, ht, truck1, truck2, truck3):
     # =========================================================================
     if play_quit_service:
         quit_service()
+
+def ask_intro_questions():
+    print("Welcome!  Please enter the capacity of each truck.")
+    print("(must be between 10 and 30)")
+    while (True):
+        num_capacity = input(Fore.WHITE + ">>> ")
+        try:
+            int(num_capacity)
+        except ValueError:
+            print("Please enter a valid capacity.")
+            continue
+        if int(num_capacity) not in range(10, 31):
+            print("Please enter a valid capacity.")
+        else:
+            break
+    num_trucks = math.ceil(87 / int(num_capacity))
+    print(f"Number of trucks (based off of capacity): {num_trucks}.")
+    print("How many of these trucks can hold refrigerated items? (must be at least one)")
+    while (True):
+        num_refrig = input(Fore.WHITE + ">>> ")
+        try:
+            int(num_refrig)
+        except ValueError:
+            print("Please enter a valid number.")
+            continue
+        if int(num_refrig) not in range(1, num_trucks):
+            print("Please enter a valid number.")
+        else:
+            break
+    return num_trucks, num_refrig, num_capacity

@@ -43,7 +43,7 @@ Package ID,Address,City,State,Zip,Delivery Deadline,Weight KILO,Weight Class,Con
 42,860 E 4800 S,Salt Lake City,UT,84107,11:00 AM,6,Small,BZHRS,
 43,1234 W 2100 S,Salt Lake City,UT,84119,EOD,3,Small,,
 44,670 S 700 E,Salt Lake City,UT,84102,10:00 AM,8,Small,SIG,
-45,3300 S 1200 W,Salt Lake City,UT,84119,EOD,15,Medium,REFRIG|BZHRS,
+45,3300 S 8400 W,Magna,UT,84044,EOD,15,Medium,REFRIG|BZHRS,
 46,2250 N 1200 W,Salt Lake City,UT,84116,EOD,4,Small,,
 47,750 W 900 S,Salt Lake City,UT,84104,9:30 AM,20,Medium,,
 48,1700 W 4700 S,Taylorsville,UT,84123,EOD,11,Medium,,

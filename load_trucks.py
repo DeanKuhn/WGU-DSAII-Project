@@ -1,80 +1,45 @@
-from datetime import datetime
-
-from status import Status
+import datetime
 from truck import Truck
-from driver import Driver
+from ga_loading import run_ga
 
-def load_trucks(ht):
+def load_trucks(num_trucks, num_refrig, num_capacity):
     # retrieve packages array from ht object
-    package_array = ht.get_array()
+    trucks = []
+    for i in range(num_trucks):
+        truck_id = i + 1
+        refrig = (i < num_refrig)
 
-    # create truck objects, add their respective package arrays
-    truck1 = Truck(
-        'Western Governors University',     # assign starting location
-        0,                                  # assign starting mileage
-        datetime(2038, 1, 19, 8, 0),        # assign departure time
-        False                               # assign refrigerated_capable
-        )
+        is_last = (i == num_trucks - 1)
+        truck = Truck(
+            truck_id=truck_id,
+            current_location='4001 South 700 East',
+            mileage=0.0,
+            departure_time=datetime.time(8, 0),
+            refrigerated_capable=refrig,
+            capacity=num_capacity
+            )
+        trucks.append(truck)
+    return trucks
 
-    truck2 = Truck(
-        '4001 South 700 East',
-        0,
-        datetime(2038, 1, 19, 8, 0),
-        False
-        )
 
-    truck3 = Truck(
-        '4001 South 700 East',
-        0,
-        datetime(2038, 1, 19, 8, 0),
-        False
-        )
-
-    truck4 = Truck(
-        '4001 South 700 East',
-        0,
-        None,
-        False
-        )
-
-    # create driver objects
-
-    driver1 = Driver(
-        1,
-        truck1,
-        datetime(2038, 1, 19, 8, 0)
-    )
-
-    driver2 = Driver(
-        2,
-        truck2,
-        datetime(2038, 1, 19, 8, 0)
-    )
-
-    driver3 = Driver(
-        3,
-        truck3,
-        datetime(2038, 1, 19, 8, 0)
-    )
-
-    # assign refrigeration-capable trucks
-    # this is one area of the code that is hard-coded
-    truck1.refrigerated_capable = True
-    truck3.refrigerated_capable = True
-
-    trucks = [truck1, truck2, truck3, truck4]
+    # ga runs here
+    # fix departure times based on what each truck ended up with
+    for truck in trucks:
+        truck.departure_time = calculate_departure_time(truck)
     refrig_trucks_list = [truck for truck in trucks if truck.refrigerated_capable]
 
+def calculate_departure_time(truck):
+    None
 
-    # self-loading loop
-    for package in package_array:
-        if package is None or package == 'Deactivated':
-            continue
-        if 'REFRIG' in package.constraints:
-            min(refrig_trucks_list, key = lambda truck: len(truck.truck_array)).truck_array.append(package)
-        # important note: REFRIG items will never be delayed
-        if 'DELAY:09:05' in package.constraints:
-            truck4.truck_array.append(package)
 
-    # return trucks to be used by nearest neighbor
-    return truck1, truck2, truck3, truck4, driver1, driver2, driver3
+    # # self-loading loop
+    # for package in package_array:
+    #     if package is None or package == 'Deactivated':
+    #         continue
+    #     if 'REFRIG' in package.constraints:
+    #         min(refrig_trucks_list, key = lambda truck: len(truck.packages)).packages.append(package)
+    #     # important note: REFRIG items will never be delayed
+    #     if 'DELAY:09:05' in package.constraints:
+    #         truck4.packages.append(package)
+
+

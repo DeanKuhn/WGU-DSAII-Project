@@ -60,7 +60,8 @@ class HashTable:
 
             if current_item is None:
                 return 'Package not found.'
-            if current_item != 'Deactivated' and current_item.package_id == package_id:
+            if current_item != 'Deactivated' and\
+                current_item.package_id == package_id:
                 return current_item
 
             # this only happens if the slot is a tombstone slot
@@ -79,7 +80,8 @@ class HashTable:
             current_item = self.array[hashed_index]
             if self.array[hashed_index] is None:
                 return "\nPackage not found."
-            if current_item != 'Deactivated' and current_item.package_id == package_id:
+            if current_item != 'Deactivated' and\
+                current_item.package_id == package_id:
                 self.array[hashed_index] = 'Deactivated'
                 print("\nYour package has been deleted.")
 

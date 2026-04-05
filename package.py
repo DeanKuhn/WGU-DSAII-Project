@@ -1,22 +1,24 @@
 from status import Status
-from datetime import datetime
+import datetime
 
 class Package:
     def __init__(
-            self,
-                 package_id,
-                 address,
-                 city,
-                 state,
-                 package_zip,
-                 deadline,
-                 weight,
-                 weight_class,
-                 constraints,
-                 notes,
-                 status,
-                 delivery_time = None
-                 ):
+                self,
+                package_id,
+                address,
+                city,
+                state,
+                package_zip,
+                deadline,
+                weight,
+                weight_class,
+                constraints,
+                notes,
+                status,
+                refrigerated,
+                delivery_time = None,
+                delay_time = None
+                ):
         self._package_id = package_id
         self._address = address
         self._city = city
@@ -28,7 +30,9 @@ class Package:
         self._constraints = constraints
         self._notes = notes
         self._status = status
+        self._refrigerated = refrigerated
         self._delivery_time = delivery_time
+        self._delay_time = delay_time
 
     # package ID should not be mutable, and therefore only have a getter
     @property
@@ -107,13 +111,32 @@ class Package:
             raise ValueError("Value does not match status values.")
 
     @property
+    def refrigerated(self):
+        return self._refrigerated
+
+    @refrigerated.setter
+    def refrigerated(self, value):
+        self._refrigerated = value
+
+    @property
     def delivery_time(self):
         return self._delivery_time
 
     @delivery_time.setter
     def delivery_time(self, value):
-        if value is None or isinstance(value, datetime):
+        if value is None or isinstance(value, datetime.time):
             self._delivery_time = value
+        else:
+            raise ValueError("Time does not match datetime format.")
+
+    @property
+    def delay_time(self):
+        return self._delay_time
+
+    @delay_time.setter
+    def delay_time(self, value):
+        if value is None or isinstance(value, datetime.time):
+            self._delay_time = value
         else:
             raise ValueError("Time does not match datetime format.")
 
