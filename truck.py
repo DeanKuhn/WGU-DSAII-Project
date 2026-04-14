@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 
 class Truck:
     def __init__(
@@ -56,7 +56,7 @@ class Truck:
 
     @departure_time.setter
     def departure_time(self, value):
-        if value is None or isinstance(value, datetime.time):
+        if value is None or isinstance(value, datetime):
             self._departure_time = value
         else:
             raise ValueError("Time does not match datetime format.")
@@ -76,3 +76,12 @@ class Truck:
     @capacity.setter
     def capacity(self, value):
         self._capacity = value
+
+    def __str__(self):
+        details = [
+            f"Package ID: {self._truck_id}",
+            f"Departure Time: {self._departure_time}",
+            f"Packages: {self._packages}",
+            f"Refrig: {self._refrigerated_capable}"
+            ]
+        return "\n".join(details)
