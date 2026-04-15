@@ -21,7 +21,6 @@ class Package:
         self._delivery_time = delivery_time
         self._delay_time = delay_time
 
-    # package ID should not be mutable, and therefore only have a getter
     @property
     def package_id(self):
         return self._package_id

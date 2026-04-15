@@ -1,316 +1,296 @@
 from colorama import Fore, init
-from datetime import datetime
 import math
+from datetime import datetime
+
+from loaders import generate_packages, load_trucks
+from genetic_algorithm import genetic_algorithm, load_chromosome
+from simulation import run_simulation
 
 init(autoreset=True)
 
-
-# define permissions for each role
-ROLE_PERMISSIONS = {
-    "user": {
-        "single_status",
-        "address_lookup",
-        "help",
-    },
-    "supervisor": {
-        "single_status",
-        "all_status",
-        "address_lookup",
-        "total_mileage",
-        "fleet_summary",
-        "truck_manifest",
-        "kpi_report",
-        "help"
-    },
-}
-
-
-# banner artwork
 def print_banner():
-    print(Fore.RED + "=" * 60)
     print(Fore.YELLOW + """
     ╔══════════════════════════════════════╗
     ║                                      ║
     ║        WGUPS Routing Service         ║
+    ║       Feat. Genetic Algorithm        ║
     ║                                      ║
     ╚══════════════════════════════════════╝""")
-    print(Fore.CYAN + "     Data Structures and Algorithms II")
-    print(Fore.RED + "=" * 60)
-    print(Fore.WHITE + "  Student : " + Fore.GREEN + "Dean Kuhn")
-    print(Fore.WHITE + "  ID      : " + Fore.YELLOW + "012897237")
 
 
 def quit_service():
-    print(Fore.RED + "=" * 60)
     print(Fore.YELLOW + """
     ╔══════════════════════════════════════╗
     ║                                      ║
     ║    Thank you for using WGUPS!        ║
-    ║    Have a great day.                 ║
+    ║         Have a great day.            ║
     ║                                      ║
-    ╚══════════════════════════════════════╝
-    """)
+    ╚══════════════════════════════════════╝""")
+    print()
 
-
-def get_active_packages(ht):
-    return [p for p in ht.get_array() if p is not None and p != "Deactivated"]
-
-
-def get_truck_by_package_id(package_id, package_to_truck):
-    return package_to_truck.get(package_id)
-
-
-def build_package_to_truck_map(trucks):
-    package_to_truck = {}
-    for truck in trucks:
-        for package in truck.packages:
-            package_to_truck[package.package_id] = truck
-    return package_to_truck
-
-
-def parse_time_input(prompt):
-    print(prompt)
+def input_int():
     while True:
-        package_time_input = input(Fore.WHITE + ">>> ")
+        choice = input('>>> ')
         try:
-            return datetime.datetime.strptime(package_time_input, "%I:%M %p").time()
+            choice = int(choice)
         except ValueError:
-            print("Invalid time format. Please use HH:MM AM/PM.")
+            print('Please enter a valid number.')
+            continue
+        return choice
 
-
-def prompt_int_input(prompt, valid_values=None):
-    print(prompt)
+def input_float():
     while True:
-        raw_value = input(Fore.WHITE + ">>> ")
+        choice = input('>>> ')
         try:
-            value = int(raw_value)
+            choice = float(choice)
         except ValueError:
-            print("Please enter a valid number.")
+            print('Please enter a valid number.')
             continue
-        if valid_values is not None and value not in valid_values:
-            print("Please enter a valid number.")
-            continue
-        return value
+        return choice
 
-
-def get_status_as_of(time, package, truck):
-    if package.delay_time is not None and time < package.delay_time:
-        return "DELAYED"
-    if truck is None or time < truck.departure_time:
-        return "AT HUB"
-    if package.delivery_time is not None and time >= package.delivery_time:
-        return "DELIVERED"
-    return "EN ROUTE"
-
-
-def print_delivery_time(time, package):
-    if package.delivery_time is None or time < package.delivery_time:
-        return "N/A"
-    return f"{package.delivery_time}"
-
-
-def print_package_status_line(package_time, package, package_truck):
-    status = get_status_as_of(package_time, package, package_truck)
-    print(
-        Fore.WHITE + "Package ID: " + Fore.GREEN + f"{package.package_id}"
-        + Fore.WHITE + " | Status: " + Fore.CYAN + status
-        + Fore.WHITE + " | Deadline: " + Fore.RED + f"{package.deadline}"
-        + Fore.WHITE + " | Delivery Time: " + Fore.YELLOW + print_delivery_time(package_time, package)
-    )
-
-
-def handle_package_lookup_by_id_time(context):
-    package_to_truck = context["package_to_truck"]
-    package_ids = {p.package_id for p in context["packages"]}
-    package_id = prompt_int_input("\nEnter package ID:", valid_values=package_ids)
-    package_time = parse_time_input("Enter time (HH:MM AM/PM):")
-    package = context["ht"].lookup(package_id)
-    package_truck = get_truck_by_package_id(package.package_id, package_to_truck)
-    print("")
-    print_package_status_line(package_time, package, package_truck)
-
-
-def handle_all_packages_at_time(context):
-    package_to_truck = context["package_to_truck"]
-    package_time = parse_time_input("\nEnter time (HH:MM AM/PM):")
-    print("")
-    for package in context["packages"]:
-        package_truck = get_truck_by_package_id(package.package_id, package_to_truck)
-        print_package_status_line(package_time, package, package_truck)
-
-
-def handle_address_lookup(context):
-    print("\nEnter full or partial address:")
-    query = input(Fore.WHITE + ">>> ").strip().lower()
-    if not query:
-        print("Address query cannot be empty.")
-        return
-
-    matches = [p for p in context["packages"] if query in p.address.lower()]
-    if not matches:
-        print("No packages matched that address query.")
-        return
-
-    print(Fore.CYAN + f"\nFound {len(matches)} package(s):")
-    for package in sorted(matches, key=lambda p: p.package_id):
-        print(
-            Fore.WHITE + f"Package {package.package_id} | "
-            + f"{package.address} | deadline {package.deadline}"
-        )
-
-
-def handle_total_mileage(context):
-    print(Fore.WHITE + "\nTotal mileage: " + Fore.YELLOW + f"{context['total_mileage']:.2f}")
-    print(Fore.WHITE + "Latest truck return: " + Fore.YELLOW + f"{context['latest_return']}")
-
-
-def handle_fleet_summary(context):
-    print(Fore.CYAN + "\n=== Fleet Summary ===")
-    print(f"Total mileage: {context['total_mileage']:.2f}")
-    print(f"Latest truck return: {context['latest_return']}")
-    print(f"Total refrigeration violations: {context['total_refrig_violations']}")
-    print(f"Total delay violations: {context['total_delay_violations']}")
-    for stats in context["truck_stats"]:
-        print(
-            f"Truck {stats['truck_id']} | packages: {stats['package_count']} | "
-            f"mileage: {stats['mileage']:.2f} | return: {stats['return_time']}"
-        )
-
-
-def handle_truck_manifest(context):
-    print(Fore.CYAN + "\n=== Truck Manifests ===")
-    for truck in context["trucks"]:
-        print(
-            f"\nTruck {truck.truck_id} | departure {truck.departure_time} | "
-            f"refrigerated: {truck.refrigerated_capable}"
-        )
-        for package in sorted(truck.packages, key=lambda p: p.package_id):
-            print(
-                f"  Package {package.package_id} | {package.address} | "
-                f"deadline {package.deadline} | delay {package.delay_time} | refrig {package.refrigerated}"
-            )
-
-
-def handle_kpi_report(context):
-    total = len(context["packages"])
-    delivered_on_time = 0
-    delayed_at_hub = 0
-    refrigerations_misassigned = 0
-
-    for package in context["packages"]:
-        truck = context["package_to_truck"].get(package.package_id)
-        if package.delay_time is not None:
-            delayed_at_hub += 1
-        if truck is not None and package.refrigerated and not truck.refrigerated_capable:
-            refrigerations_misassigned += 1
-        if package.delivery_time is not None and package.deadline is not None:
-            if package.delivery_time <= package.deadline:
-                delivered_on_time += 1
-
-    on_time_pct = (delivered_on_time / total * 100.0) if total else 0.0
-    print(Fore.CYAN + "\n=== KPI Report ===")
-    print(f"Packages total: {total}")
-    print(f"Delivered by deadline: {delivered_on_time}")
-    print(f"On-time percentage: {on_time_pct:.2f}%")
-    print(f"Packages with delay constraints: {delayed_at_hub}")
-    print(f"Refrigeration misassignments: {refrigerations_misassigned}")
-
-
-def handle_help(_context):
-    print(Fore.CYAN + "\nHelp:")
-    print("- User role can query package status, address matches, and mileage.")
-    print("- Supervisor role can also view fleet, manifest, and KPI reports.")
-    print("- Time format is always HH:MM AM/PM (example: 09:30 AM).")
-
-
-def select_role():
-    print(Fore.WHITE + "\nSelect access role:")
-    print(Fore.GREEN + "\t1. User")
-    print(Fore.YELLOW + "\t2. Supervisor")
+def input_time():
     while True:
-        role_choice = input(">>> ").strip()
-        if role_choice == "1":
-            return "user"
-        if role_choice == "2":
-            return "supervisor"
-        print("Please enter 1 or 2.")
+        time_str = input('>>> ').strip().lower()
+        try:
+            t = datetime.strptime(time_str, '%I:%M %p').time()
+            return datetime.combine(datetime(2000, 1, 1), t)
+        except ValueError:
+            print('Please enter a valid time in the correct format.')
 
+def find_delivery_status(package, truck, time):
+    # at the hub yet?
+    if package.delay_time and time < package.delay_time:
+        return 'DELAYED'
 
-def build_menu_actions(role):
-    base_actions = [
-        ("single_status", "Check a single package at a given time", handle_package_lookup_by_id_time),
-        ("all_status", "Check all packages at a given time", handle_all_packages_at_time),
-        ("address_lookup", "Lookup packages by address", handle_address_lookup),
-        ("total_mileage", "View total mileage", handle_total_mileage),
-        ("help", "Help", handle_help),
-        ("fleet_summary", "View fleet summary", handle_fleet_summary),
-        ("truck_manifest", "View truck manifests", handle_truck_manifest),
-        ("kpi_report", "View KPI report", handle_kpi_report),
-    ]
-    allowed = ROLE_PERMISSIONS[role]
-    return [action for action in base_actions if action[0] in allowed]
+    # is it at the hub waiting for a truck to leave?
+    if time < truck.departure_time:
+        return 'AT HUB'
 
+    # is it late? (if package was not delivered by deadline or still on truck)
+    if package.deadline and time > package.deadline:
+        if package.delivery_time is None or package.delivery_time > package.deadline:
+            return 'LATE'
 
-def run_cli(context):
+    # has it been delivered yet?
+    if package.delivery_time is None or package.delivery_time > time:
+        return 'EN ROUTE'
+
+    # else, it must be delivered
+    return 'DELIVERED'
+
+def get_truck_for_package(package, trucks):
+    for t in trucks:
+        if package in t.packages:
+            return t
+    print('Package not found')
+    return None
+
+def run_cli(num_addresses, address_to_id, id_to_address, distance_matrix):
     print_banner()
-    role = select_role()
-    keep_going = True
+    packages = None
+    while True:
+        print()
+        print('Would you like to:')
+        print('[1] Run GA with custom specs?')
+        print('[2] Package lookup/status? (must have already ran GA)')
+        print('[3] Exit')
 
-    while keep_going:
-        print(Fore.RED + "=" * 60)
-        print(Fore.WHITE + f"\nRole: " + Fore.YELLOW + f"{role.upper()}")
-        print("\nWould you like to...")
-        actions = build_menu_actions(role)
-        for index, (_, label, _) in enumerate(actions, start=1):
-            print(Fore.WHITE + f"\t{index}. " + Fore.GREEN + f"{label}?")
-        quit_choice = len(actions) + 1
-        print(Fore.WHITE + f"\t{quit_choice}. " + Fore.RED + "Quit?")
-        print(Fore.WHITE + f"\nType a number (1) to ({quit_choice}).")
+        choice = input_int()
+        if choice == 1:
+            packages, trucks, package_num = run_ga(num_addresses,
+                                address_to_id, id_to_address, distance_matrix)
 
-        choice = prompt_int_input("", valid_values=set(range(1, quit_choice + 1)))
-        if choice == quit_choice:
+        elif choice == 2:
+            if packages is None:
+                print('You need to run the GA at least once to generate ' \
+                    'package and truck objects.')
+            else:
+                run_lookup(packages, trucks, package_num)
+
+        elif choice == 3:
             quit_service()
-            break
-
-        permission, _, handler = actions[choice - 1]
-        if permission not in ROLE_PERMISSIONS[role]:
-            print(Fore.RED + "Unauthorized command for this role.")
-            continue
-
-        handler(context)
-        print(Fore.WHITE + "\nWould you like to quit (1) or go back to home (2)?")
-        return_home = prompt_int_input("", valid_values={1, 2})
-        keep_going = return_home == 2
-
-    if keep_going is False:
-        quit_service()
-
-def ask_intro_questions():
-    print("Welcome!  Please enter the capacity of each truck.")
-    print("(must be between 10 and 30)")
-    while (True):
-        num_capacity = input(Fore.WHITE + ">>> ")
-        try:
-            int(num_capacity)
-        except ValueError:
-            print("Please enter a valid capacity.")
-            continue
-        if int(num_capacity) not in range(10, 31):
-            print("Please enter a valid capacity.")
+            return
         else:
+            print('Please enter a valid number.')
+
+def run_ga(num_addresses, address_to_id, id_to_address, distance_matrix):
+    packages = None
+    trucks = None
+    print()
+    print('How many packages would you like to generate?')
+    package_num = input_int()
+
+    print('What proportion of packages would you like to have deadlines?')
+    print('(proportions must be a number between 0 and 1)')
+    while True:
+        deadline_num = input_float()
+        if 0 <= deadline_num <= 1: break
+        else: print('Please enter a valid number.')
+
+    print('What proportion of packages would you like to be delayed?')
+    while True:
+        delay_num = input_float()
+        if 0 <= delay_num <= 1: break
+        else: print('Please enter a valid number.')
+
+    print('What proportion of packages would you like to be refrigerated?')
+    while True:
+        refrig_num = input_float()
+        if 0 <= refrig_num <= 1: break
+        else: print('Please enter a valid number.')
+
+    print('What would you like the capacity of a single truck to be?')
+    print('(how many packages can it hold)')
+    capacity = input_int()
+
+    truck_num = math.ceil(float(package_num) / float(capacity))
+    print(f'Minimum number of trucks required: {truck_num}')
+    print(f'Enter {truck_num} to choose that as your truck number.')
+    print('Otherwise, enter a higher number if you\'d like more trucks')
+    while True:
+        truck_num_input = input_int()
+        if truck_num_input >= truck_num:
+            truck_num = truck_num_input
             break
-    num_trucks = math.ceil(100/ int(num_capacity))
-    print(f"Number of trucks (based off of capacity): {num_trucks}.")
-    print("How many of these trucks can hold refrigerated items? (must be at least one)")
-    while (True):
-        num_refrig = input(Fore.WHITE + ">>> ")
-        try:
-            int(num_refrig)
-        except ValueError:
-            print("Please enter a valid number.")
-            continue
-        if int(num_refrig) not in range(1, num_trucks):
-            print("Please enter a valid number.")
         else:
+            print('Please enter a valid number.')
+
+    refrig_truck_num = math.ceil(
+        (float(package_num) * float(refrig_num)) / float(capacity))
+    print(f'Minmimum number of refrigerated trucks required: '\
+          f'{refrig_truck_num}')
+    print(f'How many of your {truck_num} trucks would you like to be '\
+          'refrigerated?')
+    print(f'(recommended amount: {refrig_truck_num + 1})')
+    while True:
+        refrig_truck_num_input = input_int()
+        if refrig_truck_num_input >= refrig_truck_num:
+            refrig_truck_num = refrig_truck_num_input
             break
-    return num_trucks, int(num_refrig), int(num_capacity)
+        else:
+            print('Please enter a valid number.')
+
+    print('What would you like the population size of the GA to be?')
+    pop_size = input_int()
+
+    print('How many generations would you like the GA to run for?')
+    print('(must be a multiple of 10 so the GA can keep track of '\
+          'generations accurately)')
+    print('(tip: you can input a ridiculously large number (10000000) and ' \
+        'the GA will automatically end once a certain amount of ' \
+        'generations pass without an improved score)')
+    while True:
+        generations = input_int()
+        if generations % 10 == 0: break
+        else: print('Please enter a valid number.')
+
+    print('What would you like the mutation rate of the GA to be?')
+    while True:
+        mutation_rate = input_float()
+        if 0 <= mutation_rate <= 1: break
+        else: print('Please enter a valid number.')
+
+    print()
+
+    print('Now running GENETIC ALGORITHM!')
+    packages = generate_packages(package_num, deadline_num, delay_num,
+                                 refrig_num, id_to_address, num_addresses)
+    trucks = load_trucks(truck_num, refrig_truck_num, capacity)
+
+    print()
+
+    best_chromosome, bundles = genetic_algorithm(
+        packages, truck_num, trucks, capacity, address_to_id, distance_matrix,
+        mutation_rate, pop_size, generations)
+    load_chromosome(best_chromosome, bundles, packages, trucks)
+
+    # run final simulation with best chromosome
+    trucks = run_simulation(trucks, address_to_id, distance_matrix, capacity)
+    return packages, trucks, package_num
+
+def run_lookup(packages, trucks, package_num):
+    print()
+    print('How would you like to find your package?')
+    print('[1] By ID')
+    print('[2] By address')
+    while True:
+        choice = input_int()
+        if choice == 1 or choice == 2: break
+        else: print('Please enter a valid number.')
+
+    if choice == 1:
+        print()
+        print('Please enter package ID.')
+        print(f'(package IDs are in the range 0 to {package_num - 1})')
+        while True:
+            package_id = input_int()
+            if 0 <= package_id < package_num: break
+            else: print('Please enter a valid number.')
+        package = packages[package_id]
+        truck = get_truck_for_package(package, trucks)
+
+        print('Please enter time in \'HH:MM am/pm\' format.')
+        t = input_time()
+
+        status = find_delivery_status(package, truck, t)
+        print_package_status(package, status, t)
+
+    if choice == 2:
+        while True:
+            print()
+            print('Please enter the address your package is assigned to.')
+            print('In case you don\'t know any off hand, here are a few.')
+            print()
+            print('300 State St, Salt Lake City, UT 84103')
+            print('3900 S Wasatch Blvd, Salt Lake City,UT 84124')
+            print('1200 W 7800 S, West Jordan, UT 84088')
+            print()
+            print('Please copy and paste the exact address, or it may not work.')
+
+            address = input('>>> ')
+            packages_to_address = [p_id for p_id, p in packages.items()
+                                   if p.address == address]
+
+            if len(packages_to_address) == 0:
+                print('Address not found among packages. Would you like to...')
+                print('[1] Return home?')
+                print('[2] Try again?')
+                choice = input_int()
+                while True:
+                    if not (choice == 1 or choice == 2):
+                        print('Please enter a valid number')
+                    else:
+                        break
+                if choice == 1:
+                    return
+                if choice == 2:
+                    continue
+
+            print('Please enter time in \'HH:MM am/pm\' format.')
+            t = input_time()
+
+            print('Package(s) status with this address:')
+            for package_id in packages_to_address:
+                package = packages[package_id]
+                # find truck package is on
+                truck = get_truck_for_package(package, trucks)
+                status = find_delivery_status(package, truck, t)
+                print_package_status(package, status, t)
+            break
+
+def print_package_status(package, status, t):
+    if t >= package.delivery_time:
+        delivery_time = package.delivery_time
+    else:
+        delivery_time = 'N/A'
+    if not package.delay_time:
+        delay_time = 'N/A'
+    else:
+        delay_time = package.delay_time
+    if not package.deadline:
+        deadline = 'N/A'
+    else:
+        deadline = package.deadline
+    print(f'Package {package.package_id} | Status: {status} | ' \
+        f'Delivery Time: {delivery_time} | Delayed: {delay_time} | ' \
+            f'Deadline: {deadline}')

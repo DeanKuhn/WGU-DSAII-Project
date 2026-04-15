@@ -1,42 +1,17 @@
 import csv
 from datetime import datetime, timedelta
-import time
 import random
 
 from package import Package
 from truck import Truck
 
-def wait_sequence():
-    time.sleep(0.5)
-    print('.', end='', flush=True)
-    time.sleep(0.5)
-    print('.', flush=True)
-    time.sleep(0.5)
+def generate_packages(num_packages, chance_deadline, chance_delay,
+                      chance_refrigerated, id_to_address, num_addresses):
 
-def generate_packages(id_to_address, num_addresses):
-    # ask questions about # packages and chances of constraints
-    print('How many packages would you like to generate?')
-    num_packages = int(input('>>>'))
-    print('Chance of package with deadline?')
-    chance_deadline = float(input('>>>'))
-    print('Chance of package with a delay?')
-    chance_delay = float(input('>>>'))
-    print('Chance of package requiring refrigeration?')
-    chance_refrigerated = float(input('>>>'))
+    deadlines = [datetime(2000, 1, 1, 9, 0), datetime(2000, 1, 1, 10, 00),
+                 datetime(2000, 1, 1, 11, 00), datetime(2000, 1, 1, 12, 0)]
 
-    print(f'Now generating {num_packages} packages with varying deadlines.',
-          end='')
-    wait_sequence()
-    print(f'Adding in delay and refrigeration constraints.', end='')
-    wait_sequence()
-
-    deadlines = [datetime(2000, 1, 1, 9, 0), datetime(2000, 1, 1, 10, 0),
-                     datetime(2000, 1, 1, 10, 5), datetime(2000, 1, 1, 11, 0),
-                     datetime(2000, 1, 1, 11, 5), datetime(2000, 1, 1, 12, 0),
-                     datetime(2000, 1, 1, 13, 0), datetime(2000, 1, 1, 14, 0)]
-
-    delays = [datetime(2000, 1, 1, 8, 5), datetime(2000, 1, 1, 9, 0),
-                  datetime(2000, 1, 1, 9, 5)]
+    delays = [datetime(2000, 1, 1, 8, 30), datetime(2000, 1, 1, 9, 30)]
 
     notes = ['Fragile - handle with care', 'Signature required']
     chance_note = 0.5
@@ -69,38 +44,34 @@ def generate_packages(id_to_address, num_addresses):
             delivery_time=None,
             delay_time=delay
         )
-        # add to dictionary
         packages[i] = package
 
-    print('Packages have been generated!')
-    time.sleep(0.5)
     return packages
 
 def load_csvs():
     num_addresses = 0
-    # create locations dictionary mapping address, city, state, and zip
-    # to location ID
+    # create two dictionaries, one mapping address to location ID, and one
+    # mapping location ID to address
     with open('data/locations.csv', 'r') as locations:
         csv_reader = csv.DictReader(locations, delimiter=',')
         address_to_id = {}
         id_to_address = {}
         for row in csv_reader:
-            address = \
-                f'{row['Address']}, {row['City']}, {row['State']} {row['Zip']}'
             # include city, state, and zip in case of duplicate addresses
             # in different cities
-            address_to_id[address] = \
-                int(row['Location ID'])
+            address = \
+                f'{row['Address']}, {row['City']}, {row['State']} {row['Zip']}'
+
+            address_to_id[address] = int(row['Location ID'])
             id_to_address[int(row['Location ID'])] = address
             num_addresses += 1
 
-    # load distances into matrix
+    # create distance matrix
     with open('data/distances.csv', 'r') as distances:
         csv_reader = csv.reader(distances, delimiter=',')
         distance_matrix =\
         [[None for _ in range(num_addresses)] for _ in range(num_addresses)]
 
-        # insert distances into distances matrix
         row_num = 0
         for row in csv_reader:
             col_num = 0
@@ -129,4 +100,5 @@ def load_trucks(num_trucks, num_refrig, num_capacity):
             capacity=num_capacity
             )
         trucks.append(truck)
+
     return trucks
